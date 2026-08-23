@@ -6,6 +6,7 @@ import Dashboard from './pages/Dashboard.jsx'
 import Customers from './pages/Customers.jsx'
 import Orders from './pages/Orders.jsx'
 import Products from './pages/Products.jsx'
+import Ads from './pages/Ads.jsx'
 import Chat from './pages/Chat.jsx'
 
 function Shell() {
@@ -36,6 +37,7 @@ function Shell() {
     customers: <Customers />,
     orders: <Orders />,
     products: <Products />,
+    ads: <Ads />,
     chat: <Chat />,
   }
 
