@@ -100,3 +100,55 @@ export function hostOf(url) {
     return url
   }
 }
+
+// ── Ads: verdicts, confidence, evidence ──
+// Palette reuses STATUS_CONFIG colours so the classes stay in the build.
+const VERDICT_CONFIG = {
+  'SCALE':            { label: 'Scale',      bg: 'bg-green-500/15',  text: 'text-green-400',  dot: 'bg-green-400' },
+  'KEEP TESTING':     { label: 'Keep testing', bg: 'bg-blue-500/15', text: 'text-blue-400',   dot: 'bg-blue-400' },
+  'WATCH':            { label: 'Watch',      bg: 'bg-yellow-500/15', text: 'text-yellow-400', dot: 'bg-yellow-400' },
+  'REFRESH CREATIVE': { label: 'Refresh',    bg: 'bg-orange-500/15', text: 'text-orange-400', dot: 'bg-orange-400' },
+  'PAUSE':            { label: 'Pause',      bg: 'bg-red-500/15',    text: 'text-red-400',    dot: 'bg-red-400' },
+  'LEARNING':         { label: 'Learning',   bg: 'bg-bone/10',       text: 'text-bone-dark',  dot: 'bg-bone-dark' },
+}
+
+export function getVerdictConfig(verdict) {
+  return VERDICT_CONFIG[verdict] || VERDICT_CONFIG.LEARNING
+}
+
+// Sample quality, NOT statistical significance. Even 'high' is directional at
+// this account's spend — the UI says so rather than implying certainty.
+const CONFIDENCE_CONFIG = {
+  high:         { label: 'High confidence',   text: 'text-green-400',  title: 'Matured on 10+ purchases. Directional, not statistically significant.' },
+  medium:       { label: 'Medium confidence', text: 'text-blue-400',   title: 'Matured on 3–9 purchases. Treat as a lean, not a proof.' },
+  low:          { label: 'Low confidence',    text: 'text-yellow-400', title: 'Cleared the spend gate but under 3 purchases.' },
+  insufficient: { label: 'Not enough data',   text: 'text-bone-dark',  title: 'Below the ₹1,000 / 3-day maturity gate. No verdict is possible yet.' },
+}
+
+export function getConfidenceConfig(confidence) {
+  return CONFIDENCE_CONFIG[confidence] || CONFIDENCE_CONFIG.insufficient
+}
+
+const EVIDENCE_CONFIG = {
+  experiment:    { label: 'Experiment',    text: 'text-green-400',  title: 'Ran in an ad set alongside other creatives — same audience and budget, so the comparison is fair.' },
+  observational: { label: 'Observational', text: 'text-yellow-400', title: 'Ran in its own ad set. Audience, budget and timing all differ, so any ROAS gap is confounded — suggestive, not causal.' },
+}
+
+export function getEvidenceConfig(evidence) {
+  return EVIDENCE_CONFIG[evidence] || EVIDENCE_CONFIG.observational
+}
+
+// ── Ads: numbers ──
+export function formatRoas(v) {
+  return v === null || v === undefined ? '—' : `${Number(v).toFixed(2)}x`
+}
+
+export function formatPct(v, dp = 2) {
+  return v === null || v === undefined ? '—' : `${Number(v).toFixed(dp)}%`
+}
+
+export function formatDelta(current, previous) {
+  if (current == null || previous == null || !previous) return null
+  const pct = ((current - previous) / previous) * 100
+  return { pct, up: pct >= 0, label: `${pct >= 0 ? '+' : ''}${pct.toFixed(0)}%` }
+}
