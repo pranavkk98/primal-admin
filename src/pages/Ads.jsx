@@ -52,13 +52,33 @@ function CreativeCard({ c }) {
     .filter(Boolean)
 
   return (
-    <div className="card p-5 space-y-4">
+    <div className={`card p-5 space-y-4 ${c.isLive ? '' : 'opacity-75'}`}>
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
+          {/* Ad name first: this is what the account is managed by. The hook is
+              what the customer sees, so it goes underneath as context. */}
+          {c.ads?.length > 0 && (
+            <div className="text-[11px] text-bone/45 font-medium mb-1 truncate">
+              {c.ads.length === 1
+                ? c.ads[0].adName
+                : `${c.ads[0].adName} +${c.ads.length - 1} more`}
+            </div>
+          )}
           <h3 className="text-bone font-semibold text-[15px] leading-snug">
             {c.hookText || c.name || c.creativeId}
           </h3>
           <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+            <span
+              className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
+                c.isLive ? 'bg-green-500/15 text-green-400' : 'bg-bone/10 text-bone-dark'
+              }`}
+              title={c.isLive
+                ? 'At least one ad using this creative is delivering right now.'
+                : 'Every ad using this creative is paused. It spent inside the window, so its history still counts — but it is not running.'}
+            >
+              {c.isLive ? 'Live' : 'Paused'}
+            </span>
+            <span className="text-bone/20">·</span>
             <span className={`text-[11px] ${conf.text}`} title={conf.title}>{conf.label}</span>
             <span className="text-bone/20">·</span>
             <span className={`text-[11px] ${ev.text}`} title={ev.title}>{ev.label}</span>
@@ -103,6 +123,7 @@ function CreativeCard({ c }) {
 export default function Ads() {
   const [days, setDays] = useState(30)
   const [dimension, setDimension] = useState('hook_type')
+  const [liveOnly, setLiveOnly] = useState(true)
 
   const [overview, setOverview] = useState(null)
   const [creatives, setCreatives] = useState([])
@@ -136,6 +157,9 @@ export default function Ads() {
       .then(r => setRankings(r.rankings || []))
       .catch(() => setRankings([]))
   }, [days, dimension])
+
+  const liveCount = creatives.filter(c => c.isLive).length
+  const shown = liveOnly ? creatives.filter(c => c.isLive) : creatives
 
   const meta = overview?.meta || {}
   const prev = overview?.previous || {}
@@ -248,9 +272,26 @@ export default function Ads() {
 
       {/* Creative leaderboard */}
       <div>
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between mb-3 gap-3 flex-wrap">
           <h2 className="text-sm font-semibold text-bone/70">Creative leaderboard</h2>
-          <span className="text-xs text-bone/35">{creatives.length} with spend</span>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-bone/35">
+              {liveCount} live · {creatives.length - liveCount} paused
+            </span>
+            <div className="flex gap-1 bg-ink-800 border border-bone/8 rounded-lg p-1">
+              {[['Live', true], ['All', false]].map(([label, val]) => (
+                <button
+                  key={label}
+                  onClick={() => setLiveOnly(val)}
+                  className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition ${
+                    liveOnly === val ? 'bg-amber/15 text-amber' : 'text-bone/45 hover:text-bone/80'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
         {loading ? (
           <div className="space-y-3">
@@ -261,17 +302,19 @@ export default function Ads() {
               </div>
             ))}
           </div>
-        ) : creatives.length === 0 ? (
+        ) : shown.length === 0 ? (
           <div className="card">
             <EmptyState
               icon="📊"
-              title="No creatives with spend"
-              description="Nothing delivered in this window. Try the 30-day view."
+              title={liveOnly ? 'No live creatives with spend' : 'No creatives with spend'}
+              description={liveOnly
+                ? 'Nothing currently running delivered in this window. Switch to All to see paused creatives.'
+                : 'Nothing delivered in this window. Try the 30-day view.'}
             />
           </div>
         ) : (
           <div className="space-y-3">
-            {creatives.map(c => <CreativeCard key={c.creativeId} c={c} />)}
+            {shown.map(c => <CreativeCard key={c.creativeId} c={c} />)}
           </div>
         )}
       </div>
