@@ -1,0 +1,122 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =========================================================
+   PRIMAL ADMIN — Brand tokens (Primal Nutrition canonical)
+   Brand red: #EC1E27 — label canonical
+   Brand blue: #2A419B — logo blue
+   ========================================================= */
+
+:root {
+  --c-ink: 10 10 10;
+  --c-ink-800: 20 20 20;
+  --c-ink-700: 28 28 28;
+  --c-ink-600: 38 38 38;
+
+  --c-bone: 245 241 232;
+  --c-bone-dim: 216 210 194;
+  --c-bone-dark: 163 158 145;
+
+  /* amber token = brand red #EC1E27 */
+  --c-amber: 236 30 39;
+  --c-amber-light: 243 70 79;
+  --c-amber-glow: 248 110 118;
+  --c-amber-dark: 165 18 24;
+
+  /* brand gradient: fire/blood */
+  --c-grad-1: 243 58 69;
+  --c-grad-2: 236 30 39;
+  --c-grad-3: 139 15 24;
+  --c-grad-4: 30 8 10;
+
+  --c-forest: 42 65 155;
+  --c-rust: 200 24 36;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: rgb(var(--c-ink));
+  }
+  body {
+    background-color: rgb(var(--c-ink));
+    color: rgb(var(--c-bone));
+    overflow-x: hidden;
+  }
+  ::selection {
+    background: rgb(var(--c-amber));
+    color: rgb(var(--c-ink));
+  }
+  h1, h2, h3, .font-display {
+    letter-spacing: 0.005em;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply relative inline-flex items-center justify-center gap-2 text-bone font-semibold px-5 py-2.5 rounded-lg transition-all duration-200 hover:opacity-90 active:scale-95;
+    background: linear-gradient(
+      120deg,
+      rgb(var(--c-grad-1)) 0%,
+      rgb(var(--c-grad-2)) 40%,
+      rgb(var(--c-grad-3)) 100%
+    );
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 border border-bone/15 text-bone/70 font-medium px-4 py-2 rounded-lg transition-all duration-200 hover:border-amber hover:text-amber hover:bg-amber/5;
+  }
+  .card {
+    @apply bg-ink-800 rounded-xl;
+    border: 1px solid rgb(var(--c-bone) / 0.08);
+  }
+  .hairline {
+    border-top: 1px solid rgb(var(--c-bone) / 0.08);
+  }
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(var(--c-bone) / 0.12) transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 4px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: rgb(var(--c-bone) / 0.12);
+    border-radius: 2px;
+  }
+}
+
+.bg-gradient-primal {
+  background: linear-gradient(
+    120deg,
+    rgb(var(--c-grad-1)) 0%,
+    rgb(var(--c-grad-2)) 35%,
+    rgb(var(--c-grad-3)) 100%
+  );
+}
+
+/* Sidebar active glow */
+.nav-active {
+  background: rgb(var(--c-amber) / 0.12);
+  color: rgb(var(--c-amber));
+  border-left: 2px solid rgb(var(--c-amber));
+}
+
+/* Table row hover */
+.table-row-hover:hover {
+  background: rgb(var(--c-bone) / 0.03);
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

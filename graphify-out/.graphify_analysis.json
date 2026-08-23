@@ -1,0 +1,229 @@
+{
+  "communities": {
+    "0": [
+      "mockapi_buildtimeseries",
+      "mockapi_daysago",
+      "mockapi_delay",
+      "mockapi_matchchat",
+      "mockapi_mockfetch",
+      "mockapi_mulberry32",
+      "mockapi_ordersinrange",
+      "mockapi_paginate",
+      "mockapi_pick",
+      "mockapi_randfloat",
+      "mockapi_randint",
+      "mockapi_randomdateinrange",
+      "src_lib_mockapi_js"
+    ],
+    "1": [
+      "authcontext_authprovider",
+      "authcontext_decodejwtpayload",
+      "authcontext_getapibase",
+      "authcontext_ismockmode",
+      "authcontext_loadstoredsession",
+      "authcontext_useauth",
+      "src_context_authcontext_jsx"
+    ],
+    "2": [
+      "format_chartdate",
+      "format_formatinr",
+      "format_formatinrshort",
+      "format_getstatusconfig",
+      "format_relativedate",
+      "format_shortdate",
+      "src_lib_format_js"
+    ],
+    "3": [
+      "api_buildurl",
+      "api_gettoken",
+      "api_ismock",
+      "api_request",
+      "api_setsessionaccessor",
+      "src_lib_api_js"
+    ],
+    "4": [
+      "routercontext_buildhash",
+      "routercontext_readroute",
+      "routercontext_routerprovider",
+      "routercontext_usepage",
+      "src_context_routercontext_jsx"
+    ],
+    "5": [
+      "app_app",
+      "app_shell",
+      "src_app_jsx"
+    ],
+    "6": [
+      "orderdrawer_orderdrawer",
+      "orderdrawer_row",
+      "src_components_orderdrawer_jsx"
+    ],
+    "7": [
+      "src_components_topproductschart_jsx",
+      "topproductschart_customtooltip",
+      "topproductschart_topproductschart"
+    ],
+    "8": [
+      "customerdrawer_customerdrawer",
+      "customerdrawer_stattile",
+      "src_components_customerdrawer_jsx"
+    ],
+    "9": [
+      "chatmessage_chatmessage",
+      "chatmessage_resultstable",
+      "src_components_chatmessage_jsx"
+    ],
+    "10": [
+      "revenuechart_customtooltip",
+      "revenuechart_revenuechart",
+      "src_components_revenuechart_jsx"
+    ],
+    "11": [
+      "login_ismockmode",
+      "login_login",
+      "src_pages_login_jsx"
+    ],
+    "12": [
+      "chatpanel_chatpanel",
+      "src_components_chatpanel_jsx"
+    ],
+    "13": [
+      "datatable_datatable",
+      "src_components_datatable_jsx"
+    ],
+    "14": [
+      "layout_layout",
+      "src_components_layout_jsx"
+    ],
+    "15": [
+      "emptystate_emptystate",
+      "src_components_emptystate_jsx"
+    ],
+    "16": [
+      "sidebar_sidebar",
+      "src_components_sidebar_jsx"
+    ],
+    "17": [
+      "kpicard_kpicard",
+      "src_components_kpicard_jsx"
+    ],
+    "18": [
+      "src_components_statuspill_jsx",
+      "statuspill_statuspill"
+    ],
+    "19": [
+      "customers_customers",
+      "src_pages_customers_jsx"
+    ],
+    "20": [
+      "products_products",
+      "src_pages_products_jsx"
+    ],
+    "21": [
+      "orders_orders",
+      "src_pages_orders_jsx"
+    ],
+    "22": [
+      "chat_chat",
+      "src_pages_chat_jsx"
+    ],
+    "23": [
+      "dashboard_dashboard",
+      "src_pages_dashboard_jsx"
+    ],
+    "24": [
+      "src_main_jsx"
+    ],
+    "25": [
+      "src_lib_supabase_js"
+    ]
+  },
+  "cohesion": {
+    "0": 0.29,
+    "1": 0.33,
+    "2": 0.29,
+    "3": 0.53,
+    "4": 0.4,
+    "5": 0.67,
+    "6": 0.67,
+    "7": 0.67,
+    "8": 0.67,
+    "9": 0.67,
+    "10": 0.67,
+    "11": 1.0,
+    "12": 1.0,
+    "13": 1.0,
+    "14": 1.0,
+    "15": 1.0,
+    "16": 1.0,
+    "17": 1.0,
+    "18": 1.0,
+    "19": 1.0,
+    "20": 1.0,
+    "21": 1.0,
+    "22": 1.0,
+    "23": 1.0,
+    "24": 1.0,
+    "25": 1.0
+  },
+  "gods": [
+    {
+      "id": "mockapi_mockfetch",
+      "label": "mockFetch()",
+      "edges": 7
+    },
+    {
+      "id": "mockapi_daysago",
+      "label": "daysAgo()",
+      "edges": 5
+    },
+    {
+      "id": "api_request",
+      "label": "request()",
+      "edges": 4
+    },
+    {
+      "id": "mockapi_randint",
+      "label": "randInt()",
+      "edges": 3
+    },
+    {
+      "id": "mockapi_randomdateinrange",
+      "label": "randomDateInRange()",
+      "edges": 3
+    },
+    {
+      "id": "mockapi_matchchat",
+      "label": "matchChat()",
+      "edges": 3
+    },
+    {
+      "id": "authcontext_decodejwtpayload",
+      "label": "decodeJwtPayload()",
+      "edges": 2
+    },
+    {
+      "id": "authcontext_loadstoredsession",
+      "label": "loadStoredSession()",
+      "edges": 2
+    },
+    {
+      "id": "api_ismock",
+      "label": "isMock()",
+      "edges": 2
+    },
+    {
+      "id": "api_gettoken",
+      "label": "getToken()",
+      "edges": 2
+    }
+  ],
+  "surprises": [],
+  "questions": [
+    {
+      "type": "no_signal",
+      "question": null,
+      "why": "Not enough signal to generate questions. This usually means the corpus has no AMBIGUOUS edges, no bridge nodes, no INFERRED relationships, and all communities are tightly cohesive. Add more files or run with --mode deep to extract richer edges."
+    }
+  ]
+}
