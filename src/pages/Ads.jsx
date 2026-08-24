@@ -8,7 +8,13 @@ import KpiCard from '../components/KpiCard.jsx'
 import VerdictPill from '../components/VerdictPill.jsx'
 import EmptyState from '../components/EmptyState.jsx'
 
-const WINDOWS = [7, 30]
+const WINDOWS = [
+  { days: 1,   label: 'Today' },
+  { days: 7,   label: '7D' },
+  { days: 30,  label: '30D' },
+  { days: 180, label: '6M' },
+  { days: 365, label: '1Y' },
+]
 
 const DIMENSIONS = [
   { id: 'hook_type', label: 'Hook' },
@@ -78,15 +84,32 @@ function CreativeCard({ c }) {
             >
               {c.isLive ? 'Live' : 'Paused'}
             </span>
-            <span className="text-bone/20">·</span>
-            <span className={`text-[11px] ${conf.text}`} title={conf.title}>{conf.label}</span>
-            <span className="text-bone/20">·</span>
-            <span className={`text-[11px] ${ev.text}`} title={ev.title}>{ev.label}</span>
+            {c.confidence && (
+              <>
+                <span className="text-bone/20">·</span>
+                <span className={`text-[11px] ${conf.text}`} title={conf.title}>{conf.label}</span>
+              </>
+            )}
+            {c.evidence && (
+              <>
+                <span className="text-bone/20">·</span>
+                <span className={`text-[11px] ${ev.text}`} title={ev.title}>{ev.label}</span>
+              </>
+            )}
             <span className="text-bone/20">·</span>
             <span className="font-mono text-[10px] text-bone/30">{c.creativeId}</span>
           </div>
         </div>
-        <VerdictPill verdict={c.verdict} />
+        {c.verdict ? (
+          <VerdictPill verdict={c.verdict} />
+        ) : (
+          <span
+            className="text-[10px] text-bone/30 border border-bone/10 rounded-full px-2.5 py-1 whitespace-nowrap"
+            title="Verdicts are computed for the 7-day and 30-day windows only. This window has no stored verdict, so none is shown rather than guessing one."
+          >
+            no verdict
+          </span>
+        )}
       </div>
 
       <div className="grid grid-cols-3 sm:grid-cols-6 gap-4 py-3 hairline border-b border-bone/8">
@@ -161,13 +184,16 @@ export default function Ads() {
   const liveCount = creatives.filter(c => c.isLive).length
   const shown = liveOnly ? creatives.filter(c => c.isLive) : creatives
 
+  const windowLabel = WINDOWS.find(w => w.days === days)?.label ?? `${days}d`
+  const coverage = overview?.coverage || {}
+
   const meta = overview?.meta || {}
   const prev = overview?.previous || {}
   const real = overview?.real || {}
 
   const kpis = overview ? [
     {
-      label: `Spend — ${days}d`,
+      label: `Spend — ${windowLabel}`,
       value: formatINRShort(meta.spend),
       sub: `${meta.days ?? 0} days of delivery`,
       icon: '₹',
@@ -206,13 +232,13 @@ export default function Ads() {
         <div className="flex gap-1 bg-ink-800 border border-bone/8 rounded-lg p-1">
           {WINDOWS.map(w => (
             <button
-              key={w}
-              onClick={() => setDays(w)}
+              key={w.days}
+              onClick={() => setDays(w.days)}
               className={`px-3 py-1.5 rounded-md text-xs font-medium transition ${
-                days === w ? 'bg-amber/15 text-amber' : 'text-bone/50 hover:text-bone'
+                days === w.days ? 'bg-amber/15 text-amber' : 'text-bone/50 hover:text-bone'
               }`}
             >
-              {w} days
+              {w.label}
             </button>
           ))}
         </div>
@@ -241,6 +267,19 @@ export default function Ads() {
           </div>
         ))}
       </div>
+
+      {/* A 6M or 1Y window asks for more history than the tracker holds. Say so
+          rather than letting a short record look like a long one. */}
+      {!loading && coverage.truncated && (
+        <div className="card p-3.5 border-l-2 border-l-yellow-400 -mt-2">
+          <span className="text-[13px] text-bone/60">
+            Showing <b className="text-bone/80">{coverage.daysWithData} days</b> of
+            delivery. Tracking starts {coverage.firstTracked}
+            {coverage.lastTracked ? ` and ends ${coverage.lastTracked}` : ''}, so
+            the {windowLabel} view covers less than its name suggests.
+          </span>
+        </div>
+      )}
 
       {/* Why the two ROAS numbers differ — stated, not hidden. */}
       {!loading && overview && (
