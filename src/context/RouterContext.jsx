@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useState } from 'rea
 
 const RouterContext = createContext(null)
 
-const PAGES = new Set(['dashboard', 'customers', 'orders', 'products', 'ads', 'chat', 'login'])
+const PAGES = new Set(['dashboard', 'customers', 'orders', 'products', 'ads', 'spend', 'chat', 'login'])
 
 function readRoute() {
   if (typeof window === 'undefined') return { page: 'dashboard' }

@@ -7,6 +7,7 @@ import Customers from './pages/Customers.jsx'
 import Orders from './pages/Orders.jsx'
 import Products from './pages/Products.jsx'
 import Ads from './pages/Ads.jsx'
+import Spend from './pages/Spend.jsx'
 import Chat from './pages/Chat.jsx'
 
 function Shell() {
@@ -38,6 +39,7 @@ function Shell() {
     orders: <Orders />,
     products: <Products />,
     ads: <Ads />,
+    spend: <Spend />,
     chat: <Chat />,
   }
 
