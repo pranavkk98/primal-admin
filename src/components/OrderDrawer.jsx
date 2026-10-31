@@ -3,6 +3,78 @@ import { api } from '../lib/api.js'
 import { formatINR, relativeDate, shortDate, paymentMethodLabel, getChannelConfig, hostOf } from '../lib/format.js'
 import StatusPill from './StatusPill.jsx'
 
+function waPhone(phone) {
+  const d = String(phone ?? '').replace(/\D/g, '')
+  return d.length >= 10 ? '91' + d.slice(-10) : null
+}
+
+function itemSize(label) {
+  const m = String(label ?? '').match(/(\d+(?:\.\d+)?)\s*(ml|g|kg|l|caps?|tabs?)/i)
+  return m ? `${m[1]} ${m[2].toLowerCase()}` : (label ?? '')
+}
+
+function codConfirmLink(data) {
+  const phone = waPhone(data.customer?.phone)
+  if (!phone) return null
+  const first = String(data.customer?.name ?? '').trim().split(/\s+/)[0] || 'there'
+  const lines = (data.items ?? []).map((it) => {
+    const size = itemSize(it.variant_label)
+    return `• ${it.qty > 1 ? `${it.qty} × ` : ''}${it.product_name}${size ? ` – ${size}` : ''}`
+  }).join('\n')
+  const a = data.address
+  const addr = a ? `Delivery Address:\n${a.city}, ${a.state} – ${a.pincode}\n\n` : ''
+  const msg =
+    `Hi ${first} 👋\n\n` +
+    `Thank you for ordering from Primal Nutrition.\n\n` +
+    `We have received your COD order ${data.order.order_number} for:\n\n` +
+    `${lines}\n\n` +
+    `Order Total: ${formatINR(data.order.total)} COD\n\n` +
+    addr +
+    `Please reply YES to confirm that the order is correct and that you will accept the COD delivery.\n\n` +
+    `Regards,\nTeam Primal Nutrition`
+  return `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`
+}
+
+function WhatsAppContact({ data }) {
+  const phone = waPhone(data.customer?.phone)
+  const isCod = String(data.order.payment_method ?? '').toLowerCase() === 'cod'
+  const canConfirm = isCod && !['cancelled', 'delivered'].includes(data.order.status)
+  return (
+    <div className="bg-ink-700 border border-bone/8 rounded-xl p-3">
+      <div className="text-[10px] font-medium text-bone/35 uppercase tracking-[0.15em] mb-2.5">Contact Buyer</div>
+      {!phone ? (
+        <div className="text-bone/40 text-xs">No phone on file</div>
+      ) : (
+        <div className="flex flex-wrap items-center gap-3">
+          {canConfirm ? (
+            <a
+              href={codConfirmLink(data)}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-green-500/15 text-green-400 border border-green-500/25 hover:bg-green-500/25 transition"
+            >
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M17.5 14.4c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.8.9-.9 1.1-.2.2-.3.2-.6.1-.3-.1-1.2-.4-2.3-1.4-.9-.8-1.4-1.700-1.600-2-.2-.3 0-.4.100-.6l.4-.5c.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5-.1-.1-.7-1.600-.9-2.200-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.500s1.100 2.900 1.200 3.100c.1.2 2.100 3.200 5.100 4.500.7.3 1.300.5 1.700.6.7.2 1.400.2 1.900.1.600-.1 1.700-.7 2-1.400.2-.7.2-1.300.2-1.400-.1-.1-.3-.2-.6-.3zM12 2a10 10 0 00-8.600 15.100L2 22l5-1.300A10 10 0 1012 2z" />
+              </svg>
+              Confirm COD on WhatsApp
+            </a>
+          ) : (
+            <a
+              href={`https://wa.me/${phone}`}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium text-green-400 border border-green-500/25 hover:bg-green-500/10 transition"
+            >
+              WhatsApp
+            </a>
+          )}
+          <span className="text-bone/60 text-xs">+91 {phone.slice(2, 7)} {phone.slice(7)}</span>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function OrderDrawer({ orderId, onClose, onViewCustomer }) {
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -80,6 +152,8 @@ export default function OrderDrawer({ orderId, onClose, onViewCustomer }) {
                   Placed {relativeDate(data.order.placed_at)} · {shortDate(data.order.placed_at)}
                 </div>
               </div>
+
+              <WhatsAppContact data={data} />
 
               {/* Order actions */}
               <OrderActions
