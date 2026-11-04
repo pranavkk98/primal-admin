@@ -1,5 +1,7 @@
 import { usePage } from '../context/RouterContext.jsx'
+import { useEffect, useState } from 'react'
 import { useAuth } from '../context/AuthContext.jsx'
+import { api } from '../lib/api.js'
 
 const NAV = [
   {
@@ -57,6 +59,15 @@ const NAV = [
     ),
   },
   {
+    id: 'creators',
+    label: 'T-REX Athletes',
+    icon: (
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+      </svg>
+    ),
+  },
+  {
     id: 'chat',
     label: 'AI Chat',
     icon: (
@@ -70,6 +81,14 @@ const NAV = [
 export default function Sidebar() {
   const { page, navigate } = usePage()
   const { user, logout } = useAuth()
+  const [requests, setRequests] = useState(0)
+
+  // Pending creator requests badge (silent on failure)
+  useEffect(() => {
+    api.get('/api/admin/creators', { limit: 1 })
+      .then((r) => setRequests(r?.counts?.applied ?? 0))
+      .catch(() => {})
+  }, [page])
 
   return (
     <aside className="w-56 flex-shrink-0 bg-ink-800 border-r border-bone/8 flex flex-col h-screen sticky top-0">
@@ -102,6 +121,9 @@ export default function Sidebar() {
             >
               <span className={active ? 'text-amber' : 'text-bone/40'}>{item.icon}</span>
               {item.label}
+              {item.id === 'creators' && requests > 0 && (
+                <span className="ml-auto text-[10px] bg-amber text-ink px-1.5 py-0.5 rounded-full font-semibold">{requests}</span>
+              )}
               {item.id === 'chat' && (
                 <span className="ml-auto text-[9px] bg-amber/20 text-amber px-1.5 py-0.5 rounded font-medium">AI</span>
               )}

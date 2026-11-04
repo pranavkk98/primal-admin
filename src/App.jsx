@@ -9,6 +9,7 @@ import Products from './pages/Products.jsx'
 import Ads from './pages/Ads.jsx'
 import Spend from './pages/Spend.jsx'
 import Chat from './pages/Chat.jsx'
+import Creators from './pages/Creators.jsx'
 
 function Shell() {
   const { page } = usePage()
@@ -40,6 +41,7 @@ function Shell() {
     products: <Products />,
     ads: <Ads />,
     spend: <Spend />,
+    creators: <Creators />,
     chat: <Chat />,
   }
 
