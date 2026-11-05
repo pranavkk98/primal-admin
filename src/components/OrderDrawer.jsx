@@ -35,10 +35,48 @@ function codConfirmLink(data) {
   return `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`
 }
 
+function AutoStatus({ order }) {
+  if (order.cod_confirmed_at) {
+    return <div className="mt-2 text-xs text-green-400">✓ COD confirmed on WhatsApp · {shortDate(order.cod_confirmed_at)}</div>
+  }
+  if (order.wa_cod_sent_at) {
+    return <div className="mt-2 text-xs text-bone/50">Auto-message sent {relativeDate(order.wa_cod_sent_at)} · awaiting YES</div>
+  }
+  if (order.wa_cod_error) {
+    return <div className="mt-2 text-xs text-red-400">Auto-message failed: {order.wa_cod_error}</div>
+  }
+  return null
+}
+
+// Online payment started but never completed: nudge the buyer back with a product link.
+function paymentFailedLink(data) {
+  const phone = waPhone(data.customer?.phone)
+  if (!phone) return null
+  const first = String(data.customer?.name ?? '').trim().split(/\s+/)[0] || 'there'
+  const items = data.items ?? []
+  const product = items.length === 1 ? items[0].product_name : 'Primal Nutrition'
+  const slug = items.length === 1 ? items[0].product_slug : null
+  const link = slug
+    ? `https://primalnutrition.in/?p=${slug}&utm_source=whatsapp&utm_medium=recovery&utm_campaign=failed_payment`
+    : 'https://primalnutrition.in/#/shop?utm_source=whatsapp&utm_medium=recovery&utm_campaign=failed_payment'
+  const total = Number(data.order.total)
+  // Online orders carry the ₹200 prepaid discount; COD is the price without it.
+  const cod = Number(data.order.discount) >= 200 ? total + 200 : total
+  const msg =
+    `Hi ${first} 👋 This is Team Primal Nutrition.\n` +
+    `We noticed your ${product} order (${data.order.order_number}) for ${formatINR(total)} didn't complete — the payment didn't go through.\n` +
+    `You can finish it here in 2 taps, same ${formatINR(total)} price when you pay online:\n` +
+    `${link}\n` +
+    `Prefer Cash on Delivery? Just reply COD and we'll arrange it (${formatINR(cod)}).\n` +
+    `Team Primal Nutrition`
+  return `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`
+}
+
 function WhatsAppContact({ data }) {
   const phone = waPhone(data.customer?.phone)
   const isCod = String(data.order.payment_method ?? '').toLowerCase() === 'cod'
   const canConfirm = isCod && !['cancelled', 'delivered'].includes(data.order.status)
+  const paymentFailed = !isCod && data.order.status === 'pending' && !data.order.razorpay_payment_id
   return (
     <div className="bg-ink-700 border border-bone/8 rounded-xl p-3">
       <div className="text-[10px] font-medium text-bone/35 uppercase tracking-[0.15em] mb-2.5">Contact Buyer</div>
@@ -58,6 +96,18 @@ function WhatsAppContact({ data }) {
               </svg>
               Confirm COD on WhatsApp
             </a>
+          ) : paymentFailed ? (
+            <a
+              href={paymentFailedLink(data)}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-green-500/15 text-green-400 border border-green-500/25 hover:bg-green-500/25 transition"
+            >
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M17.5 14.4c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.8.9-.9 1.1-.2.2-.3.2-.6.1-.3-.1-1.2-.4-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.4.1-.6l.4-.5c.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5-.1-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.7-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.1-.3-.2-.6-.3zM12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2z" />
+              </svg>
+              Payment failed? WhatsApp buyer
+            </a>
           ) : (
             <a
               href={`https://wa.me/${phone}`}
@@ -71,6 +121,7 @@ function WhatsAppContact({ data }) {
           <span className="text-bone/60 text-xs">+91 {phone.slice(2, 7)} {phone.slice(7)}</span>
         </div>
       )}
+      {isCod && <AutoStatus order={data.order} />}
     </div>
   )
 }
