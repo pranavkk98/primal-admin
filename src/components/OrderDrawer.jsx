@@ -206,6 +206,8 @@ export default function OrderDrawer({ orderId, onClose, onViewCustomer }) {
 
               <WhatsAppContact data={data} />
 
+              <IthinkSync data={data} onSynced={reload} />
+
               {/* Order actions */}
               <OrderActions
                 status={data.order.status}
@@ -356,6 +358,58 @@ export default function OrderDrawer({ orderId, onClose, onViewCustomer }) {
         </div>
       </div>
     </>
+  )
+}
+
+/* Shipping panel status: whether this order has been copied into iThink
+   (Sync Order API). Courier is booked manually in iThink. Orders booked in
+   Shiprocket before the switch show that instead. */
+function IthinkSync({ data, onSynced }) {
+  const [busy, setBusy] = useState(false)
+  const [err, setErr] = useState(null)
+  const o = data.order
+  if (o.status === 'cancelled') return null
+
+  const send = async () => {
+    setBusy(true)
+    setErr(null)
+    try {
+      await api.post(`/api/admin/orders/${o.id}/sync-ithink`, {})
+      await onSynced?.()
+    } catch (e) {
+      setErr(e?.body?.message || e.message || 'Could not send to iThink')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  let line
+  if (o.ithink_synced_at) {
+    line = <span className="text-green-400">In iThink · sent {relativeDate(o.ithink_synced_at)}</span>
+  } else if (o.shiprocket_order_id) {
+    line = <span className="text-bone/60">Booked in Shiprocket{o.awb_code ? ` · AWB ${o.awb_code}` : ''}</span>
+  } else if (o.ithink_sync_error) {
+    line = <span className="text-red-400">Not in iThink: {o.ithink_sync_error}</span>
+  } else {
+    line = <span className="text-bone/50">Not sent to iThink yet</span>
+  }
+
+  return (
+    <div className="bg-ink-700 border border-bone/8 rounded-xl p-3">
+      <div className="text-[10px] font-medium text-bone/35 uppercase tracking-[0.15em] mb-2.5">Shipping Panel</div>
+      <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
+        {line}
+        {!o.shiprocket_order_id && (
+          <ActionBtn
+            label={o.ithink_synced_at ? 'Resend to iThink' : 'Send to iThink'}
+            loading={busy}
+            variant="primary"
+            onClick={send}
+          />
+        )}
+      </div>
+      {err && <p className="mt-2 text-xs text-red-400">{err}</p>}
+    </div>
   )
 }
 
