@@ -7,6 +7,7 @@ const RESEND_COOLDOWN_SECONDS = 30
 const ALLOWED_EMAILS = [
   { email: 'pranavkk3199@gmail.com', label: 'Pranav' },
   { email: 'saleshead@primalnutrition.in', label: 'Sales Head' },
+  { email: 'team@primalnutrition.in', label: 'Team' },
 ]
 
 export default function Login() {

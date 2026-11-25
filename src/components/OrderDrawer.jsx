@@ -360,7 +360,7 @@ export default function OrderDrawer({ orderId, onClose, onViewCustomer }) {
 }
 
 function OrderActions({ status, actionLoading, actionError, onAction }) {
-  const canCancel   = status === 'pending' || status === 'paid'
+  const canCancel   = status === 'pending' || status === 'paid' || status === 'shipped'
   const canShip     = status === 'pending' || status === 'paid'
   const canDeliver  = status === 'shipped'
 
@@ -392,7 +392,10 @@ function OrderActions({ status, actionLoading, actionError, onAction }) {
             loading={actionLoading === 'cancelled'}
             variant="danger"
             onClick={() => {
-              if (window.confirm('Cancel this order? This cannot be undone.')) onAction('cancelled')
+              const msg = status === 'shipped'
+                ? 'Cancel this order? It is already shipped, so also cancel or RTO the shipment in Shiprocket. This cannot be undone.'
+                : 'Cancel this order? This cannot be undone.'
+              if (window.confirm(msg)) onAction('cancelled')
             }}
           />
         )}
